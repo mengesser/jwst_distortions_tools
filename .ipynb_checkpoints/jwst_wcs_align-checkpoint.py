@@ -1152,7 +1152,10 @@ class jwst_wcs_align(apply_distortion_singleim):
                 showplots=0,
                 saveplots=0,
                 savephottable=0,
-                ee_radius=70
+                ee_radius=70,
+                refcat_magcol=None,
+                refcat_magerrcol=None,
+                refcat_maincolor=None,
                 ):
             
         
@@ -1175,6 +1178,9 @@ class jwst_wcs_align(apply_distortion_singleim):
                               refcatname=refcatname,
                               refcat_racol=refcat_racol,
                               refcat_deccol=refcat_deccol,
+                              refcat_magcol=refcat_magcol,
+                              refcat_magerrcol=refcat_magerrcol,
+                              refcat_color=refcat_maincolor,
                               pmflag=pmflag,
                               pm_median=pm_median,
                               outrootdir=self.outdir,

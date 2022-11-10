@@ -63,17 +63,26 @@ def hst_get_ee_corr(ap,filt,inst):
                                    'uvis-encircled-energy/_documents/wfc3uvis2_aper_007_syn.csv',
                                       'wfc3uvis2_aper_007_syn.csv')
         ee = Table.read('wfc3uvis2_aper_007_syn.csv',format='ascii')
+
+    
     filts = ee['FILTER']
     ee.remove_column('FILTER')
-    waves = ee['WAVELENGTH']
-    ee.remove_column('WAVELENGTH')
+    
+    if inst=='ir':
+        waves = ee['PIVOT']
+        ee.remove_column('PIVOT')
+    else:
+        waves = ee['WAVELENGTH']
+        ee.remove_column('WAVELENGTH')
     ee_arr = np.array([ee[col] for col in ee.colnames])
     apps = [float(x.split('#')[1]) for x in ee.colnames]
     interp = scipy.interpolate.interp2d(waves,apps,ee_arr)
+    
     filt_wave = waves[np.where(filts==filt.upper())[0][0]]
     return(interp(filt_wave,ap))
 
 def hst_get_zp(filt,zpsys='ab'):
+    
     if zpsys.lower()=='ab':
         return {'F098M':25.666,'F105W':26.264,'F110W':26.819,'F125W':26.232,'F140W':26.450,'F160W':25.936}[filt]
     elif zpsys.lower()=='vega':
@@ -1452,7 +1461,7 @@ class jwst_photclass(pdastrostatsclass):
             self.find_stars()
             
             #aperture phot, saved in self.t
-            self.aperture_phot()
+            self.aperture_phot(filt=self.filtername)
              
         
         # get the indices of good stars
@@ -1636,6 +1645,9 @@ class hst_photclass(jwst_photclass):
             inst = 'uvis'
         if radii_Nfwhm is not None:
             self.radii_px = radii_Nfwhm*self.dict_utils[self.instrument][self.filtername]['psf fwhm']
+            
+        print(zp, inst)
+            
         self.apcorr = hst_get_ee_corr(self.radii_px*self.pixel_scale,self.filtername,inst)
         self.radius_sky_in_px,self.radius_sky_out_px = self.radii_px*3,self.radii_px*5
 
